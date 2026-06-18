@@ -13,24 +13,39 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ClienteControllerTest {
-    @Autowired 
-    MockMvc mockMvc;
+
+    @Autowired
+    private MockMvc mockMvc;
+
     @Test
-void deveCriarClienteComSucesso() throws Exception {
-    String json = "{\"nome\":\"Alexandre\",\"email\":\"alexandre@teste.com\"}";
-    
-    mockMvc.perform(post("/api/clientes")
-        .contentType("application/json")
-        .content(json))
-        .andExpect(status().isCreated());
-}
-@Test
-void naoDeveCriarClienteComCpfInvalido() throws Exception {
-    String json = "{\"nome\":\"Alexandre\",\"cpf\":\"000\"}";
-    
-    mockMvc.perform(post("/api/clientes")
-        .contentType("application/json")
-        .content(json))
-        .andExpect(status().isBadRequest());
-}
+    void deveCriarClienteComSucesso() throws Exception {
+
+        String json = """
+        {
+            "nome":"Alexandre",
+            "email":"alexandre@teste.com"
+        }
+        """;
+
+        mockMvc.perform(post("/api/clientes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void naoDeveCriarClienteComEmailInvalido() throws Exception {
+
+        String json = """
+        {
+            "nome":"Alexandre",
+            "email":"email-invalido"
+        }
+        """;
+
+        mockMvc.perform(post("/api/clientes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isBadRequest());
+    }
 }

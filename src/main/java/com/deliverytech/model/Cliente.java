@@ -2,6 +2,7 @@ package com.deliverytech.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -12,7 +13,8 @@ import java.util.List;
 @Builder
 public class Cliente {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String nome;
@@ -20,8 +22,10 @@ public class Cliente {
     @Column(unique = true)
     private String email;
 
+    @Builder.Default
     private Boolean ativo = true;
 
+    @Builder.Default
     private LocalDateTime dataCriacao = LocalDateTime.now();
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)

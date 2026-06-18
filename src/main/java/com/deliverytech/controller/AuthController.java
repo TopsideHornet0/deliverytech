@@ -2,10 +2,13 @@ package com.deliverytech.controller;
 
 import com.deliverytech.dto.request.LoginRequest;
 import com.deliverytech.dto.request.RegisterRequest;
+import com.deliverytech.exception.ConflictException;
+import com.deliverytech.exception.EntityNotFoundException;
 import com.deliverytech.model.Role;
 import com.deliverytech.model.Usuario;
 import com.deliverytech.repository.UsuarioRepository;
 import com.deliverytech.security.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,8 +16,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,8 +29,9 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
+
         if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Email já cadastrado");
+            throw new ConflictException("Email já cadastrado");
         }
 
         Usuario usuario = Usuario.builder()
@@ -42,16 +44,39 @@ public class AuthController {
                 .build();
 
         usuarioRepository.save(usuario);
-        String token = jwtUtil.generateToken(User.withUsername(usuario.getEmail()).password(usuario.getSenha()).authorities("ROLE_" + usuario.getRole().name()).build(), usuario);
+
+        String token = jwtUtil.generateToken(
+                User.withUsername(usuario.getEmail())
+                        .password(usuario.getSenha())
+                        .authorities("ROLE_" + usuario.getRole().name())
+                        .build(),
+                usuario
+        );
+
         return ResponseEntity.ok(token);
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha()));
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getSenha()
+                )
+        );
+
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        String token = jwtUtil.generateToken(User.withUsername(usuario.getEmail()).password(usuario.getSenha()).authorities("ROLE_" + usuario.getRole().name()).build(), usuario);
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        String token = jwtUtil.generateToken(
+                User.withUsername(usuario.getEmail())
+                        .password(usuario.getSenha())
+                        .authorities("ROLE_" + usuario.getRole().name())
+                        .build(),
+                usuario
+        );
+
         return ResponseEntity.ok(token);
     }
 }

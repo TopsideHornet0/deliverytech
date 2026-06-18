@@ -2,6 +2,7 @@ package com.deliverytech.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,7 +12,8 @@ import java.time.LocalDateTime;
 @Builder
 public class Usuario {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -24,8 +26,10 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Builder.Default
     private Boolean ativo = true;
 
+    @Builder.Default
     private LocalDateTime dataCriacao = LocalDateTime.now();
 
     private Long restauranteId;

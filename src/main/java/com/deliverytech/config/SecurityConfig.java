@@ -29,31 +29,44 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sess ->
+                        sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/api-docs/**", "/h2-console/**").permitAll()
 
+                        // Públicos
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/api-docs/**", "/v3/api-docs/**", "/h2-console/**").permitAll()
+
+                        // Clientes
                         .requestMatchers("/api/clientes").hasAnyAuthority("ROLE_ADMIN", "ROLE_CLIENTE")
                         .requestMatchers("/api/clientes/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_CLIENTE")
 
+                        // Pedidos
                         .requestMatchers("/api/pedidos").hasAuthority("ROLE_CLIENTE")
                         .requestMatchers("/api/pedidos/**").hasAuthority("ROLE_CLIENTE")
 
+                        // Restaurantes
                         .requestMatchers("/api/restaurantes").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/restaurantes/**").hasAuthority("ROLE_ADMIN")
+
+                        // Produtos
                         .requestMatchers("/api/produtos").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/produtos/**").hasAuthority("ROLE_ADMIN")
 
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(
+                        jwtAuthFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
                 .build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration
+    ) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
@@ -64,9 +77,12 @@ public class SecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        DaoAuthenticationProvider authProvider =
+                new DaoAuthenticationProvider();
+
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
+
         return authProvider;
     }
 }

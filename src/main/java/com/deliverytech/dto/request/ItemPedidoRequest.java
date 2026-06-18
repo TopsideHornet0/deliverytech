@@ -2,16 +2,19 @@ package com.deliverytech.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemPedidoRequest {
 
-    @NotNull
+    @NotNull(message = "O produto deve ser informado para adicionar um item ao pedido.")
     private Long produtoId;
 
-    @Positive
+    @NotNull(message = "A quantidade é obrigatória.")
+    @Positive(message = "A quantidade deve ser maior que zero.")
     private Integer quantidade;
 }

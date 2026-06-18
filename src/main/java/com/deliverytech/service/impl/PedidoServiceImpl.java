@@ -1,5 +1,6 @@
 package com.deliverytech.service.impl;
 
+import com.deliverytech.exception.EntityNotFoundException;
 import com.deliverytech.model.Pedido;
 import com.deliverytech.model.StatusPedido;
 import com.deliverytech.repository.PedidoRepository;
@@ -40,10 +41,11 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     public Pedido atualizarStatus(Long id, StatusPedido status) {
         return pedidoRepository.findById(id)
-            .map(p -> {
-                p.setStatus(status);
-                return pedidoRepository.save(p);
-            }).orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                .map(p -> {
+                    p.setStatus(status);
+                    return pedidoRepository.save(p);
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Pedido", id));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.deliverytech.service.impl;
 
+import com.deliverytech.exception.EntityNotFoundException;
 import com.deliverytech.model.Produto;
 import com.deliverytech.repository.ProdutoRepository;
 import com.deliverytech.service.ProdutoService;
@@ -33,13 +34,14 @@ public class ProdutoServiceImpl implements ProdutoService {
     @Override
     public Produto atualizar(Long id, Produto atualizado) {
         return produtoRepository.findById(id)
-            .map(p -> {
-                p.setNome(atualizado.getNome());
-                p.setDescricao(atualizado.getDescricao());
-                p.setCategoria(atualizado.getCategoria());
-                p.setPreco(atualizado.getPreco());
-                return produtoRepository.save(p);
-            }).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .map(p -> {
+                    p.setNome(atualizado.getNome());
+                    p.setDescricao(atualizado.getDescricao());
+                    p.setCategoria(atualizado.getCategoria());
+                    p.setPreco(atualizado.getPreco());
+                    return produtoRepository.save(p);
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Produto", id));
     }
 
     @Override

@@ -2,19 +2,17 @@ package com.deliverytech.controller;
 
 import com.deliverytech.dto.request.ClienteRequest;
 import com.deliverytech.dto.response.ClienteResponse;
+import com.deliverytech.exception.EntityNotFoundException;
 import com.deliverytech.model.Cliente;
 import com.deliverytech.service.ClienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/clientes")
@@ -39,31 +37,48 @@ public class ClienteController {
 
         logger.debug("Cliente salvo com ID {}", salvo.getId());
 
-        return ResponseEntity.ok(new ClienteResponse(salvo.getId(), salvo.getNome(), salvo.getEmail(), salvo.getAtivo()));
+        return ResponseEntity.ok(new ClienteResponse(
+                salvo.getId(),
+                salvo.getNome(),
+                salvo.getEmail(),
+                salvo.getAtivo()
+        ));
     }
 
     @GetMapping
     public Page<ClienteResponse> listar(Pageable pageable) {
         logger.info("Contas ativas na Plataforma");
-        Page<Cliente> clientesPaginados = clienteService.listarAtivos(pageable);
-        return clientesPaginados.map(c -> new ClienteResponse(c.getId(), c.getNome(), c.getEmail(), c.getAtivo()));
 
+        Page<Cliente> clientesPaginados = clienteService.listarAtivos(pageable);
+
+        return clientesPaginados.map(c -> new ClienteResponse(
+                c.getId(),
+                c.getNome(),
+                c.getEmail(),
+                c.getAtivo()
+        ));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ClienteResponse> buscar(@PathVariable Long id) {
         logger.info("Buscando cliente com ID: {}", id);
-        return clienteService.buscarPorId(id)
-                .map(c -> new ClienteResponse(c.getId(), c.getNome(), c.getEmail(), c.getAtivo()))
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> {
-                    logger.warn("Cliente com ID {} não encontrado", id);
-                    return ResponseEntity.notFound().build();
-                });
+
+        Cliente cliente = clienteService.buscarPorId(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cliente", id));
+
+        return ResponseEntity.ok(new ClienteResponse(
+                cliente.getId(),
+                cliente.getNome(),
+                cliente.getEmail(),
+                cliente.getAtivo()
+        ));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClienteResponse> atualizar(@PathVariable Long id, @Valid @RequestBody ClienteRequest request) {
+    public ResponseEntity<ClienteResponse> atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody ClienteRequest request
+    ) {
         logger.info("Atualizando cliente ID: {}", id);
 
         Cliente atualizado = Cliente.builder()
@@ -73,7 +88,12 @@ public class ClienteController {
 
         Cliente salvo = clienteService.atualizar(id, atualizado);
 
-        return ResponseEntity.ok(new ClienteResponse(salvo.getId(), salvo.getNome(), salvo.getEmail(), salvo.getAtivo()));
+        return ResponseEntity.ok(new ClienteResponse(
+                salvo.getId(),
+                salvo.getNome(),
+                salvo.getEmail(),
+                salvo.getAtivo()
+        ));
     }
 
     @PatchMapping("/{id}/status")

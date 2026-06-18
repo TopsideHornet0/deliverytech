@@ -2,8 +2,8 @@ package com.deliverytech.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.math.BigDecimal;
-import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -13,7 +13,8 @@ import java.util.List;
 @Builder
 public class Restaurante {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String nome;
@@ -26,6 +27,7 @@ public class Restaurante {
 
     private Integer tempoEntregaMinutos;
 
+    @Builder.Default
     private Boolean ativo = true;
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL)
