@@ -4,6 +4,8 @@ import com.deliverytech.model.Restaurante;
 import com.deliverytech.repository.RestauranteRepository;
 import com.deliverytech.service.RestauranteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,8 +28,8 @@ public class RestauranteServiceImpl implements RestauranteService {
     }
 
     @Override
-    public List<Restaurante> listarTodos() {
-        return restauranteRepository.findAll();
+    public Page<Restaurante> listarTodos(Pageable pageable) {
+        return restauranteRepository.findAll(pageable);
     }
 
     @Override
@@ -38,13 +40,14 @@ public class RestauranteServiceImpl implements RestauranteService {
     @Override
     public Restaurante atualizar(Long id, Restaurante atualizado) {
         return restauranteRepository.findById(id)
-            .map(r -> {
-                r.setNome(atualizado.getNome());
-                r.setTelefone(atualizado.getTelefone());
-                r.setCategoria(atualizado.getCategoria());
-                r.setTaxaEntrega(atualizado.getTaxaEntrega());
-                r.setTempoEntregaMinutos(atualizado.getTempoEntregaMinutos());
-                return restauranteRepository.save(r);
-            }).orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+                .map(r -> {
+                    r.setNome(atualizado.getNome());
+                    r.setTelefone(atualizado.getTelefone());
+                    r.setCategoria(atualizado.getCategoria());
+                    r.setTaxaEntrega(atualizado.getTaxaEntrega());
+                    r.setTempoEntregaMinutos(atualizado.getTempoEntregaMinutos());
+                    return restauranteRepository.save(r);
+                })
+                .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
     }
 }
