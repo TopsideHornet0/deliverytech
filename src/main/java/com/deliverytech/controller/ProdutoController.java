@@ -7,6 +7,8 @@ import com.deliverytech.model.Produto;
 import com.deliverytech.model.Restaurante;
 import com.deliverytech.service.ProdutoService;
 import com.deliverytech.service.RestauranteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +20,19 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/produtos")
 @RequiredArgsConstructor
+@Tag(
+        name = "Produtos",
+        description = "Operações relacionadas ao gerenciamento de produtos"
+)
 public class ProdutoController {
 
     private final ProdutoService produtoService;
     private final RestauranteService restauranteService;
 
+    @Operation(
+            summary = "Cadastrar produto",
+            description = "Cria um novo produto vinculado a um restaurante."
+    )
     @PostMapping
     public ResponseEntity<ProdutoResponse> cadastrar(@Valid @RequestBody ProdutoRequest request) {
 
@@ -50,6 +60,10 @@ public class ProdutoController {
         ));
     }
 
+    @Operation(
+            summary = "Listar produtos por restaurante",
+            description = "Retorna todos os produtos de um restaurante específico."
+    )
     @GetMapping("/restaurante/{restauranteId}")
     public List<ProdutoResponse> listarPorRestaurante(@PathVariable Long restauranteId) {
 
@@ -68,6 +82,10 @@ public class ProdutoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(
+            summary = "Atualizar produto",
+            description = "Atualiza os dados de um produto existente."
+    )
     @PutMapping("/{id}")
     public ResponseEntity<ProdutoResponse> atualizar(
             @PathVariable Long id,
@@ -93,6 +111,10 @@ public class ProdutoController {
         ));
     }
 
+    @Operation(
+            summary = "Alterar disponibilidade",
+            description = "Ativa ou desativa a disponibilidade de um produto."
+    )
     @PatchMapping("/{id}/disponibilidade")
     public ResponseEntity<Void> alterarDisponibilidade(
             @PathVariable Long id,

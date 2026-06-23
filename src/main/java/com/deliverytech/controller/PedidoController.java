@@ -9,6 +9,8 @@ import com.deliverytech.service.ClienteService;
 import com.deliverytech.service.PedidoService;
 import com.deliverytech.service.ProdutoService;
 import com.deliverytech.service.RestauranteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,10 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/pedidos")
 @RequiredArgsConstructor
+@Tag(
+        name = "Pedidos",
+        description = "Operações relacionadas à criação e gerenciamento de pedidos"
+)
 public class PedidoController {
 
     private final PedidoService pedidoService;
@@ -28,6 +34,10 @@ public class PedidoController {
     private final RestauranteService restauranteService;
     private final ProdutoService produtoService;
 
+    @Operation(
+            summary = "Criar pedido",
+            description = "Cria um novo pedido vinculando cliente, restaurante, endereço de entrega e itens do pedido."
+    )
     @PostMapping
     public ResponseEntity<PedidoResponse> criar(@Valid @RequestBody PedidoRequest request) {
 

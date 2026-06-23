@@ -5,6 +5,8 @@ import com.deliverytech.dto.response.ClienteResponse;
 import com.deliverytech.exception.EntityNotFoundException;
 import com.deliverytech.model.Cliente;
 import com.deliverytech.service.ClienteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -17,12 +19,20 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/clientes")
 @RequiredArgsConstructor
+@Tag(
+        name = "Clientes",
+        description = "Operações relacionadas ao gerenciamento de clientes"
+)
 public class ClienteController {
 
     private static final Logger logger = LoggerFactory.getLogger(ClienteController.class);
 
     private final ClienteService clienteService;
 
+    @Operation(
+            summary = "Cadastrar cliente",
+            description = "Cria um novo cliente na plataforma."
+    )
     @PostMapping
     public ResponseEntity<ClienteResponse> cadastrar(@Valid @RequestBody ClienteRequest request) {
         logger.info("Cadastro de cliente iniciado: {}", request.getEmail());
@@ -45,6 +55,10 @@ public class ClienteController {
         ));
     }
 
+    @Operation(
+            summary = "Listar clientes",
+            description = "Lista todos os clientes ativos com paginação."
+    )
     @GetMapping
     public Page<ClienteResponse> listar(Pageable pageable) {
         logger.info("Contas ativas na Plataforma");
@@ -59,6 +73,10 @@ public class ClienteController {
         ));
     }
 
+    @Operation(
+            summary = "Buscar cliente por ID",
+            description = "Retorna os dados de um cliente específico."
+    )
     @GetMapping("/{id}")
     public ResponseEntity<ClienteResponse> buscar(@PathVariable Long id) {
         logger.info("Buscando cliente com ID: {}", id);
@@ -74,6 +92,10 @@ public class ClienteController {
         ));
     }
 
+    @Operation(
+            summary = "Atualizar cliente",
+            description = "Atualiza os dados de um cliente existente."
+    )
     @PutMapping("/{id}")
     public ResponseEntity<ClienteResponse> atualizar(
             @PathVariable Long id,
@@ -96,6 +118,10 @@ public class ClienteController {
         ));
     }
 
+    @Operation(
+            summary = "Ativar ou desativar cliente",
+            description = "Alterna o status ativo/inativo de um cliente."
+    )
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> ativarDesativar(@PathVariable Long id) {
         logger.info("Alterando status do cliente ID: {}", id);
@@ -103,6 +129,10 @@ public class ClienteController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            summary = "Status da API",
+            description = "Verifica se a API está online."
+    )
     @GetMapping("/status")
     public ResponseEntity<String> status() {
         logger.debug("Status endpoint acessado");
