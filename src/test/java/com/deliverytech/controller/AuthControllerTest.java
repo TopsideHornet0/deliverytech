@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -54,7 +55,12 @@ public class AuthControllerTest {
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Erro de validação"))
+                .andExpect(jsonPath("$.message").value("Campos inválidos na requisição"))
+                .andExpect(jsonPath("$.path").value("/api/auth/register"))
+                .andExpect(jsonPath("$.details.email").exists());
     }
 
     @Test
@@ -73,7 +79,12 @@ public class AuthControllerTest {
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Erro de validação"))
+                .andExpect(jsonPath("$.message").value("Campos inválidos na requisição"))
+                .andExpect(jsonPath("$.path").value("/api/auth/register"))
+                .andExpect(jsonPath("$.details.senha").exists());
     }
 
     @Test
@@ -105,5 +116,33 @@ public class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(loginJson))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void naoDeveRegistrarEmailDuplicado() throws Exception {
+
+        String json = """
+        {
+            "email":"ezio.auditore@assassins.com",
+            "senha":"123456",
+            "nome":"Ezio Auditore",
+            "role":"CLIENTE",
+            "restauranteId":0
+        }
+        """;
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.error").value("Conflito de dados"))
+                .andExpect(jsonPath("$.message").value("Email já cadastrado"))
+                .andExpect(jsonPath("$.path").value("/api/auth/register"));
     }
 }
