@@ -20,6 +20,7 @@ com\deliverytech\model\ItemPedido.class
 com\deliverytech\service\impl\ProdutoServiceImpl.class
 com\deliverytech\service\ProdutoService.class
 com\deliverytech\service\PedidoService.class
+com\deliverytech\exception\GlobalExceptionHandler.class
 com\deliverytech\controller\AuthController.class
 com\deliverytech\model\Endereco.class
 com\deliverytech\service\impl\RestauranteServiceImpl.class
@@ -28,10 +29,13 @@ com\deliverytech\dto\request\ItemPedidoRequest.class
 com\deliverytech\model\ItemPedido$ItemPedidoBuilder.class
 com\deliverytech\model\Pedido$PedidoBuilder.class
 com\deliverytech\model\Cliente$ClienteBuilder.class
+com\deliverytech\exception\EntityNotFoundException.class
 com\deliverytech\model\Usuario.class
 com\deliverytech\controller\PedidoController.class
 com\deliverytech\dto\request\ClienteRequest.class
+com\deliverytech\exception\BusinessException.class
 com\deliverytech\security\JwtUtil.class
+com\deliverytech\exception\ErrorResponse.class
 com\deliverytech\dto\response\ClienteResponse.class
 com\deliverytech\model\Produto$ProdutoBuilder.class
 com\deliverytech\dto\response\ProdutoResponse.class
@@ -48,5 +52,6 @@ com\deliverytech\dto\response\ItemPedidoResponse.class
 com\deliverytech\dto\request\PedidoRequest.class
 com\deliverytech\model\Usuario$UsuarioBuilder.class
 com\deliverytech\model\Cliente.class
+com\deliverytech\exception\ConflictException.class
 com\deliverytech\model\Produto.class
 com\deliverytech\dto\request\RegisterRequest.class
