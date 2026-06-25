@@ -15,23 +15,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class ClienteControllerTest {
+public class RestauranteControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void deveCriarClienteComSucesso() throws Exception {
+    void deveCriarRestauranteComSucesso() throws Exception {
 
         String json = """
         {
-            "nome":"Altair Ibn-La'Ahad",
-            "email":"altair.ibn.lahad@assassins.com"
+            "nome":"Taverna Davenport",
+            "categoria":"Comida Colonial",
+            "telefone":"11999990001",
+            "taxaEntrega":7.50,
+            "tempoEntregaMinutos":45
         }
         """;
 
-        mockMvc.perform(post("/api/clientes")
+        mockMvc.perform(post("/api/restaurantes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isOk());
@@ -39,16 +42,19 @@ public class ClienteControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void naoDeveCriarClienteComEmailEmBranco() throws Exception {
+    void naoDeveCriarRestauranteComNomeEmBranco() throws Exception {
 
         String json = """
         {
-            "nome":"Connor Kenway",
-            "email":""
+            "nome":"",
+            "categoria":"Comida Colonial",
+            "telefone":"11999990001",
+            "taxaEntrega":7.50,
+            "tempoEntregaMinutos":45
         }
         """;
 
-        mockMvc.perform(post("/api/clientes")
+        mockMvc.perform(post("/api/restaurantes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isBadRequest());
@@ -56,16 +62,19 @@ public class ClienteControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void naoDeveCriarClienteComEmailInvalido() throws Exception {
+    void naoDeveCriarRestauranteComCategoriaEmBranco() throws Exception {
 
         String json = """
         {
-            "nome":"Haytham Kenway",
-            "email":"email-invalido"
+            "nome":"Taverna Kenway",
+            "categoria":"",
+            "telefone":"11999990002",
+            "taxaEntrega":8.00,
+            "tempoEntregaMinutos":50
         }
         """;
 
-        mockMvc.perform(post("/api/clientes")
+        mockMvc.perform(post("/api/restaurantes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isBadRequest());
