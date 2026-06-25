@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -51,7 +52,12 @@ public class ClienteControllerTest {
         mockMvc.perform(post("/api/clientes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Erro de validação"))
+                .andExpect(jsonPath("$.message").value("Campos inválidos na requisição"))
+                .andExpect(jsonPath("$.path").value("/api/clientes"))
+                .andExpect(jsonPath("$.details.email").exists());
     }
 
     @Test
@@ -68,6 +74,11 @@ public class ClienteControllerTest {
         mockMvc.perform(post("/api/clientes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Erro de validação"))
+                .andExpect(jsonPath("$.message").value("Campos inválidos na requisição"))
+                .andExpect(jsonPath("$.path").value("/api/clientes"))
+                .andExpect(jsonPath("$.details.email").exists());
     }
 }

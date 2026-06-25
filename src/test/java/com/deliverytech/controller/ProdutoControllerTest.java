@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -85,7 +86,12 @@ public class ProdutoControllerTest {
         mockMvc.perform(post("/api/produtos")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Erro de validação"))
+                .andExpect(jsonPath("$.message").value("Campos inválidos na requisição"))
+                .andExpect(jsonPath("$.path").value("/api/produtos"))
+                .andExpect(jsonPath("$.details.nome").exists());
     }
 
     @Test
@@ -105,7 +111,12 @@ public class ProdutoControllerTest {
         mockMvc.perform(post("/api/produtos")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Erro de validação"))
+                .andExpect(jsonPath("$.message").value("Campos inválidos na requisição"))
+                .andExpect(jsonPath("$.path").value("/api/produtos"))
+                .andExpect(jsonPath("$.details.preco").exists());
     }
 
     @Test
@@ -125,7 +136,11 @@ public class ProdutoControllerTest {
         mockMvc.perform(post("/api/produtos")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Recurso não encontrado"))
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.path").value("/api/produtos"));
     }
 
     @Test
