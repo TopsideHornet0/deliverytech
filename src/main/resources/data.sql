@@ -2,9 +2,11 @@ DELETE FROM item_pedido;
 DELETE FROM pedido;
 DELETE FROM produto;
 DELETE FROM restaurante;
+DELETE FROM cliente;
 
 ALTER TABLE restaurante ALTER COLUMN id RESTART WITH 1;
 ALTER TABLE produto ALTER COLUMN id RESTART WITH 1;
+ALTER TABLE cliente ALTER COLUMN id RESTART WITH 1;
 
 INSERT INTO restaurante (nome, categoria, telefone, taxa_entrega, tempo_entrega_minutos, ativo) VALUES
 ('Pizzaria Almeida', 'Massa', '0800555760', 5.00, 120, true),
@@ -27,3 +29,9 @@ INSERT INTO produto (nome, categoria, descricao, preco, disponivel, restaurante_
 ('Vinho de Monteriggioni', 'Bebida', 'Bebida especial da Estalagem Auditore', 18.90, true, 5),
 ('Peixe Black Flag', 'Frutos do Mar', 'Peixe grelhado da tripulação Black Flag', 49.90, true, 6),
 ('Rum do Capitão', 'Bebida', 'Bebida temática da Taberna Black Flag', 21.90, true, 6);
+
+INSERT INTO cliente (nome, email, ativo) VALUES
+('Gabriela Lima', 'gabi.lima@gmail.com', true),
+('Joao Lucas', 'joao@email.com', true),
+('Connor Kenway', 'connor.kenway@assassins.com', true),
+('Ezio Auditore', 'ezio.auditore@assassins.com', true);
