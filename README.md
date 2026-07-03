@@ -9,7 +9,7 @@ O objetivo é reproduzir uma plataforma completa de delivery, aplicando conceito
 # 🚀 Visão Geral
 
 <p align="center">
-  <img src="src/assets/banner-api.png" alt="Banner DeliveryTech" width="100%">
+  <img src="src/assests/banner-api.png" alt="Banner DeliveryTech" width="100%">
 </p>
 
 <p align="center">
@@ -56,7 +56,7 @@ Todo código foi estudado, compreendido e validado antes de ser aplicado.
 # 🏗 Arquitetura da Aplicação
 
 <p align="center">
-  <img src="src/assets/arquitetura-api.png" alt="Arquitetura da Aplicação" width="100%">
+  <img src="src/assests/arquitetura-api.png" alt="Arquitetura da Aplicação" width="100%">
 </p>
 
 ### Controller
@@ -76,7 +76,7 @@ Camada de persistência.
 # 🔄 Fluxo da API
 
 <p align="center">
-  <img src="src/assets/fluxo-api.png" alt="Fluxo da API" width="100%">
+  <img src="src/assests/fluxo-api.png" alt="Fluxo da API" width="100%">
 </p>
 
 Representa o fluxo completo:
