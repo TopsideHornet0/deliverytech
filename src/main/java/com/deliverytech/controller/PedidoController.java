@@ -38,27 +38,26 @@ public class PedidoController {
             summary = "Criar pedido",
             description = "Cria um novo pedido vinculando cliente, restaurante, endereço de entrega e itens do pedido."
     )
-    @PostMapping
-    public ResponseEntity<PedidoResponse> criar(@Valid @RequestBody PedidoRequest request) {
+  @PostMapping
+public ResponseEntity<PedidoResponse> criar(@Valid @RequestBody PedidoRequest request) {
 
-        Cliente cliente = clienteService.buscarPorId(request.getClienteId())
-                .orElseThrow(() -> new EntityNotFoundException("Cliente", request.getClienteId()));
+    Cliente cliente = clienteService.buscarPorId(request.getClienteId());
 
-        Restaurante restaurante = restauranteService.buscarPorId(request.getRestauranteId())
-                .orElseThrow(() -> new EntityNotFoundException("Restaurante", request.getRestauranteId()));
+    Restaurante restaurante = restauranteService.buscarPorId(request.getRestauranteId())
+            .orElseThrow(() -> new EntityNotFoundException("Restaurante", request.getRestauranteId()));
 
-        List<ItemPedido> itens = request.getItens().stream()
-                .map(item -> {
-                    Produto produto = produtoService.buscarPorId(item.getProdutoId())
-                            .orElseThrow(() -> new EntityNotFoundException("Produto", item.getProdutoId()));
+    List<ItemPedido> itens = request.getItens().stream()
+            .map(item -> {
+                Produto produto = produtoService.buscarPorId(item.getProdutoId())
+                        .orElseThrow(() -> new EntityNotFoundException("Produto", item.getProdutoId()));
 
-                    return ItemPedido.builder()
-                            .produto(produto)
-                            .quantidade(item.getQuantidade())
-                            .precoUnitario(produto.getPreco())
-                            .build();
-                })
-                .collect(Collectors.toList());
+                return ItemPedido.builder()
+                        .produto(produto)
+                        .quantidade(item.getQuantidade())
+                        .precoUnitario(produto.getPreco())
+                        .build();
+            })
+            .collect(Collectors.toList());
 
         BigDecimal total = itens.stream()
                 .map(i -> i.getPrecoUnitario().multiply(BigDecimal.valueOf(i.getQuantidade())))

@@ -1,10 +1,11 @@
 package com.deliverytech.service.impl;
 
-import com.deliverytech.exception.EntityNotFoundException;
 import com.deliverytech.model.Produto;
 import com.deliverytech.repository.ProdutoRepository;
 import com.deliverytech.service.ProdutoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,21 +18,25 @@ public class ProdutoServiceImpl implements ProdutoService {
     private final ProdutoRepository produtoRepository;
 
     @Override
+    @CacheEvict(value = {"produtos", "produtosPorRestaurante"}, allEntries = true)
     public Produto cadastrar(Produto produto) {
         return produtoRepository.save(produto);
     }
 
     @Override
+    @Cacheable(value = "produtos", key = "#id")
     public Optional<Produto> buscarPorId(Long id) {
         return produtoRepository.findById(id);
     }
 
     @Override
+    @Cacheable(value = "produtosPorRestaurante", key = "#restauranteId")
     public List<Produto> buscarPorRestaurante(Long restauranteId) {
         return produtoRepository.findByRestauranteId(restauranteId);
     }
 
     @Override
+    @CacheEvict(value = {"produtos", "produtosPorRestaurante"}, allEntries = true)
     public Produto atualizar(Long id, Produto atualizado) {
         return produtoRepository.findById(id)
                 .map(p -> {
@@ -41,14 +46,17 @@ public class ProdutoServiceImpl implements ProdutoService {
                     p.setPreco(atualizado.getPreco());
                     return produtoRepository.save(p);
                 })
-                .orElseThrow(() -> new EntityNotFoundException("Produto", id));
+                .orElseThrow(() -> new RuntimeException("Produto não localizado: " + id));
     }
 
     @Override
+    @CacheEvict(value = {"produtos", "produtosPorRestaurante"}, allEntries = true)
     public void alterarDisponibilidade(Long id, boolean disponivel) {
-        produtoRepository.findById(id).ifPresent(p -> {
-            p.setDisponivel(disponivel);
-            produtoRepository.save(p);
-        });
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não localizado: " + id));
+
+        produto.setDisponivel(disponivel);
+
+        produtoRepository.save(produto);
     }
 }

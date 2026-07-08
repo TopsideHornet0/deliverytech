@@ -5,11 +5,11 @@ import com.deliverytech.model.Cliente;
 import com.deliverytech.repository.ClienteRepository;
 import com.deliverytech.service.ClienteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,44 +18,50 @@ public class ClienteServiceImpl implements ClienteService {
     private final ClienteRepository clienteRepository;
 
     @Override
+    @CacheEvict(value = {"clientes", "clientesAtivos"}, allEntries = true)
     public Cliente cadastrar(Cliente cliente) {
         return clienteRepository.save(cliente);
     }
 
     @Override
-    public Optional<Cliente> buscarPorId(Long id) {
-        return clienteRepository.findById(id);
+    @Cacheable(value = "clientes", key = "#id")
+    public Cliente buscarPorId(Long id) {
+        return clienteRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Cliente não localizado", id));
     }
 
     @Override
+    @Cacheable(
+            value = "clientesAtivos",
+            key = "#pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort"
+    )
     public Page<Cliente> listarAtivos(Pageable pageable) {
         return clienteRepository.findByAtivoTrue(pageable);
     }
 
     @Override
+    @CacheEvict(value = {"clientes", "clientesAtivos"}, allEntries = true)
     public Cliente atualizar(Long id, Cliente atualizado) {
-        return clienteRepository.findById(id)
-                .map(c -> {
-                    c.setNome(atualizado.getNome());
-                    c.setEmail(atualizado.getEmail());
-                    return clienteRepository.save(c);
-                })
-                .orElseThrow(() -> new EntityNotFoundException("Cliente", id));
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Cliente não localizado", id));
+
+        cliente.setNome(atualizado.getNome());
+        cliente.setEmail(atualizado.getEmail());
+
+        return clienteRepository.save(cliente);
     }
 
     @Override
+    @CacheEvict(value = {"clientes", "clientesAtivos"}, allEntries = true)
     public void ativarDesativar(Long id) {
-        clienteRepository.findById(id).ifPresent(c -> {
-            c.setAtivo(!c.getAtivo());
-            clienteRepository.save(c);
-        });
-    }
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Cliente não localizado", id));
 
-    private void simulateDelay() {
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        cliente.setAtivo(!cliente.getAtivo());
+
+        clienteRepository.save(cliente);
     }
 }

@@ -48,6 +48,7 @@ com\deliverytech\dto\request\RestauranteRequest.class
 com\deliverytech\model\Pedido.class
 com\deliverytech\dto\request\LoginRequest.class
 com\deliverytech\service\impl\ClienteServiceImpl.class
+com\deliverytech\config\CacheConfig.class
 com\deliverytech\dto\response\ItemPedidoResponse.class
 com\deliverytech\dto\request\PedidoRequest.class
 com\deliverytech\model\Usuario$UsuarioBuilder.class

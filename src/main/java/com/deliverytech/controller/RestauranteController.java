@@ -9,8 +9,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,7 +64,22 @@ public class RestauranteController {
             description = "Lista todos os restaurantes com paginação."
     )
     @GetMapping
-    public Page<RestauranteResponse> listarTodos(Pageable pageable) {
+    public Page<RestauranteResponse> listarTodos(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") String sort
+    ) {
+        String[] sortParams = sort.split(",");
+        String sortField = sortParams[0];
+        String sortDirection = sortParams.length > 1 ? sortParams[1] : "asc";
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.Direction.fromString(sortDirection),
+                sortField
+        );
+
         Page<Restaurante> restaurantesPaginados = restauranteService.listarTodos(pageable);
 
         return restaurantesPaginados.map(r -> new RestauranteResponse(
@@ -142,5 +160,15 @@ public class RestauranteController {
                 salvo.getTempoEntregaMinutos(),
                 salvo.getAtivo()
         ));
+    }
+
+    @Operation(
+            summary = "Limpar cache dos restaurantes",
+            description = "Remove todas as entradas do cache de restaurantes."
+    )
+    @CacheEvict(value = "restaurantes", allEntries = true)
+    @GetMapping("/cache/limpar")
+    public ResponseEntity<Void> limparCache() {
+        return ResponseEntity.noContent().build();
     }
 }

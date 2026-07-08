@@ -2,7 +2,6 @@ package com.deliverytech.controller;
 
 import com.deliverytech.dto.request.ClienteRequest;
 import com.deliverytech.dto.response.ClienteResponse;
-import com.deliverytech.exception.EntityNotFoundException;
 import com.deliverytech.model.Cliente;
 import com.deliverytech.service.ClienteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,8 +10,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,8 +47,6 @@ public class ClienteController {
 
         Cliente salvo = clienteService.cadastrar(cliente);
 
-        logger.debug("Cliente salvo com ID {}", salvo.getId());
-
         return ResponseEntity.ok(new ClienteResponse(
                 salvo.getId(),
                 salvo.getNome(),
@@ -60,8 +60,23 @@ public class ClienteController {
             description = "Lista todos os clientes ativos com paginação."
     )
     @GetMapping
-    public Page<ClienteResponse> listar(Pageable pageable) {
-        logger.info("Contas ativas na Plataforma");
+    public Page<ClienteResponse> listar(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") String sort
+    ) {
+        logger.info("Listando clientes ativos");
+
+        String[] sortParams = sort.split(",");
+        String sortField = sortParams[0];
+        String sortDirection = sortParams.length > 1 ? sortParams[1] : "asc";
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.Direction.fromString(sortDirection),
+                sortField
+        );
 
         Page<Cliente> clientesPaginados = clienteService.listarAtivos(pageable);
 
@@ -81,8 +96,7 @@ public class ClienteController {
     public ResponseEntity<ClienteResponse> buscar(@PathVariable Long id) {
         logger.info("Buscando cliente com ID: {}", id);
 
-        Cliente cliente = clienteService.buscarPorId(id)
-                .orElseThrow(() -> new EntityNotFoundException("Cliente", id));
+        Cliente cliente = clienteService.buscarPorId(id);
 
         return ResponseEntity.ok(new ClienteResponse(
                 cliente.getId(),
@@ -126,6 +140,17 @@ public class ClienteController {
     public ResponseEntity<Void> ativarDesativar(@PathVariable Long id) {
         logger.info("Alterando status do cliente ID: {}", id);
         clienteService.ativarDesativar(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Limpar cache de clientes",
+            description = "Remove todos os dados armazenados no cache de clientes."
+    )
+    @CacheEvict(value = {"clientes", "clientesAtivos"}, allEntries = true)
+    @GetMapping("/cache/limpar")
+    public ResponseEntity<Void> limparCacheClientes() {
+        logger.info("Limpando cache de clientes");
         return ResponseEntity.noContent().build();
     }
 
